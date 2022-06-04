@@ -1,0 +1,32 @@
+#!/bin/bash
+BUILD_DIR="/workspace"
+CACHE_DIR=$1
+LAYERS_DIR=$1
+ENV_DIR="/platform/env/"
+BP_DIR=$CNB_BUILDPACK_DIR
+
+ANTIWORD_LAYER="${LAYERS_DIR}/antiword"
+mkdir -p $ANTIWORD_LAYER
+echo -e '[types]\ncache = true\nlaunch = true\nbuild = true' >> ${ANTIWORD_LAYER}.toml
+PROFILE_PATH="${ANTIWORD_LAYER}/profile.d/antiword.sh"
+
+INSTALL_DIR=$BUILD_DIR/vendor/antiword/
+
+ANTIWORD_DIR=/workspace/vendor/antiword/antiword-0.37
+
+echo "Untarring antiword-0.37.tar.gz into ${INSTALL_DIR}"
+
+mkdir -p $INSTALL_DIR
+tar -zxvf antiword-0.37.tar.gz -C $INSTALL_DIR
+cd ${INSTALL_DIR}antiword-0.37
+make
+
+# mkdir ${HOME}/.antiword
+# cp ${INSTALL_DIR}Resources/. .antiword
+
+
+echo "Complete!"
+echo "Building runtime environment for antiword int ${BUILD_DIR}"
+
+mkdir -p $(dirname $PROFILE_PATH)
+echo "export PATH=\"${ANTIWORD_DIR}:\$PATH\"" > $PROFILE_PATH
